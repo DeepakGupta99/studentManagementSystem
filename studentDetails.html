@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.14.0/jquery-ui.js" integrity="sha256-u0L8aA6Ev3bY2HI4y0CAyr9H8FRWgX4hZ9+K7C2nzdc=" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/ca1acfcdd5.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.6.0/css/sharp-duotone-solid.css">
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.6.0/css/sharp-thin.css">
+    <link rel="stylesheet" data-purpose="Layout StyleSheet" title="Web Awesome" href="/css/app-wa-3b124ff0e0d7a67cd8c995d0aeb1d15a.css?vsn=d">
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.6.0/css/all.css">
+    <script>
+        let studentArray=[];
+        $(function(){
+            $("#content").css({"width": "100%", "display": "flex"});
+            $("#left-content").css({"width": "45%"});
+            $("#right-content").css({"width":"55%", "margin":"auto","padding-left":"8rem"});
+            $("#studentImg").css({"width":"80%", "margin-left":"10rem", "margin-top":"8rem", "border":"1px solid grey", "border-radius": "200%"});
+            $("i").css({"font-size":"3rem"});
+            $("#studentAdd").css({"font-size":"1.5rem","width":"50%", "margin-left":"2rem","padding":"0.5rem", "background-color":"rgb(12,110,253)", "border":"none", "border-radius":"10px"});
+            $("#studentDetail").css({"font-size":"1.5rem","color":"white", "width":"50%", "margin-left":"2rem","padding":"0.5rem", "background-color":"rgb(12,110,253)", "border":"none", "border-radius":"10px"});
+            $("#GaO").css({"font-size":"1.5rem","color":"white", "width":"50%", "margin-left":"3rem","padding":"0.5rem", "background-color":"rgb(12,110,253)", "border":"none", "border-radius":"10px"});
+            $("#about").css({"font-size":"1.5rem","color":"white", "width":"50%", "margin-left":"2.7rem","padding":"0.5rem", "background-color":"rgb(12,110,253)", "border":"none", "border-radius":"10px"});
+            $("input").css({"width":"80%", "padding":"0.5rem 1rem 0.5rem 1rem", "border-radius":"5px","border":"1px solid"});
+            $("#table-content").css({"width":"80%", "margin":"auto", "margin-top":"5rem", "display":"none"});
+            $("#studentDetailForm").css({"width":"100%", "margin":"auto"});
+
+            let currentIndex
+            const maxSizeOfSubjec=4;
+            // Student Details Submission Function
+            $("#SubmitBtn").click(function(){
+                // Taking values from the input fields and storing it into const varaible
+                const studentName=$("#studentName").val();
+                const roll_no=$("#roll_no").val();
+                const studentClass=$("#studentClass").val();
+                const studentDiv=$("#studentDiv").val();
+                // calling dropdown of student name
+                const studentNameSelection=$("#studentNameSelection");
+                // checking for validation whether every field are filled or not
+                if(studentName!=="" && roll_no!=="" && studentClass!=="" && studentDiv!==""){
+                    // creating object of each student
+                    let studentObj={
+                        name:studentName,
+                        rollNo:roll_no,
+                        Class:studentClass,
+                        Division:studentDiv,
+                        Subject:[
+                        ]
+                    };
+
+                    studentArray.push(studentObj);
+                    localStorage.setItem("Student Details",JSON.stringify(studentArray));
+                    console.log(studentArray);
+                    currentIndex=studentArray.length-1;
+                    studentNameSelection.append(`<option value="${currentIndex}">${studentArray[currentIndex].name}</option>`);
+                    console.log(currentIndex);
+                    $("#studentDetailForm")[0].reset();
+
+                    // $("#studentDetailForm").hide();
+                    $("#studentSubjectForm").show();
+                }
+                // If field will not be filled then it will show alert meassage
+                else{
+                    alert("Please Fill out all Fields");
+                }
+            } );
+
+            $("#addDetails").click(function(){
+                let subjectName=$("#SubjectSelection").val();
+                let subjectMarks=$("#subjectMarks").val();
+                let studentrollno=$("#studentNameSelection").val();
+
+                if(subjectName!=="" && subjectMarks!=="" && studentrollno!==""){
+                    let subject={
+                        subjectName:subjectName,
+                        subjectMarks:subjectMarks
+                    }
+                    studentArray[currentIndex].Subject.push(subject);
+                    localStorage.setItem("Student Details",JSON.stringify(studentArray));
+                    console.log(studentArray);
+                    $("#SubjectSelection option[value='"+subjectName+"']").remove();
+                    alert("Marks for "+subjectName+" has been added for "+studentArray[currentIndex].name);
+                    $("#studentSubjectForm")[0].reset();
+
+                    if(studentArray[currentIndex].Subject.length == maxSizeOfSubjec){
+                        alert("All 4 Subjects Marks have been entered");
+                        resetSubjectDropdown();
+                        // $("#studentSubjectForm").hide();
+                    }
+                }
+                else{
+                    alert("Please select a valid subject and enter marks..");
+                }
+                
+            });
+
+            function resetSubjectDropdown(){
+            $("#SubjectSelection").html('<option disabled="" selected="">Please select subject</option> <option value="English">English</option> <option value="Maths">Maths</option> <option value="Hindi">Hindi</option> <option value="Marathi">Marathi</option>')
+            };
+
+            let count=1;
+            $("#studentDetail").click(function(){
+                debugger;
+               let totalMarks=0;
+                $("#table-content").show();
+               
+
+                let StudentData = localStorage.getItem("Student Details");
+                if(StudentData){
+                    let students=JSON.parse(StudentData);
+                    console.log(students);
+                    $.each(students, function(index, student){
+                        if( (parseInt(student.Subject[0].subjectMarks))>=35 &&(parseInt(student.Subject[1].subjectMarks))>=35 &&  (parseInt(student.Subject[2].subjectMarks))>=35 && (parseInt(student.Subject[3].subjectMarks))>=35 ){
+                        let row=`<tr><th scope="row">${student.rollNo}</th><td>${student.name}</td><td>${student.Class}</td><td>${student.Division}</td><th>${student.Subject[0].subjectMarks}</th><td>${student.Subject[1].subjectMarks}</td><td>${student.Subject[2].subjectMarks}</td><td>${student.Subject[3].subjectMarks}</td><td style="background-color:green; color:white; padding-left:1rem">Pass</td></tr>`;
+                        $("#table-body").append(row);
+                        console.log($(student.Subject[0].subjectMarks));
+                        }
+                        else{
+                            let row=`<tr><th scope="row">${student.rollNo}</th><td>${student.name}</td><td>${student.Class}</td><td>${student.Division}</td><th>${student.Subject[0].subjectMarks}</th><td>${student.Subject[1].subjectMarks}</td><td>${student.Subject[2].subjectMarks}</td><td>${student.Subject[3].subjectMarks}</td><td style="background-color:red; color:white; padding-left:1rem">Fail</td></tr>`;
+                            $("#table-body").append(row);
+                        }
+                    });
+                }
+            });
+
+
+        });
+    </script>
+  </head>
+  <body>
+    <nav class="navbar bg-body-tertiary">
+        <div class="container-fluid">
+          <span class="navbar-brand mb-0 h1">Guru Nanak School</span>
+        </div>
+      </nav>
+      <div id="content">
+      <div id="left-content">
+        <img id="studentImg" src="Images/studentImage.jpg" alt="">      
+      </div>
+      <div id="right-content">
+        <i class="fa-solid fa-solid fa-user-plus"></i><button id="studentAdd" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Add Student Details</button><br>
+        <i class="fa-solid fa-memo-circle-info"></i> <button id="studentDetail">Show Student Details</button><br>
+        <i class="fa-solid fa-square-info"></i><button id="GaO">Goals and Objectives</button><br>
+        <i class="fa-solid fa-magnifying-glass"></i><button id="about">About Us</button>
+      </div>
+    </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">Add Details</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="studentDetailForm" action="">
+                    <label for="">Name:</label><br>
+                    <input type="text" id="studentName" placeholder="Enter student name..." ><br><br>
+                    <label for="">Roll no:</label><br>
+                    <input type="text" id="roll_no" placeholder="Enter student Roll No..." ><br><br>
+                    <label for="">Class:</label><br>
+                    <input type="text" id="studentClass" placeholder="Enter student class..." ><br><br>
+                    <label for="">Division:</label><br>
+                    <input type="text" id="studentDiv" placeholder="Enter student division..." ><br><br>
+                    <input type="button" value="Submit Student Details" id="SubmitBtn" class="btn btn-primary">
+                    <!-- <button type="button" id="SubmitBtn" class="btn btn-primary">Submit</button> -->
+                </form>
+            </div>
+            <div class="modal-footer" style="justify-content: center;">
+                <form id="studentSubjectForm" action="">
+                <label style="padding: 0rem;" for="salutation">Select Subject:</label>
+                <select name="salutation" id="SubjectSelection">
+                <option disabled="" selected="">Please select subject</option>
+                <option value="English">English</option>
+                <option value="Maths">Maths</option>
+                <option value="Hindi">Hindi</option>
+                <option value="Marathi">Marathi</option>
+                </select><br><br>
+                <label for="">Marks:</label><br>
+                    <input type="number" id="subjectMarks" placeholder="Enter Marks..." required><br><br>
+                    <label style="padding: 0rem;" for="salutation">Select Student:</label>
+                <select name="salutation" id="studentNameSelection">
+                <option disabled="" selected="">Please select student</option>
+                </select><br><br>
+                <input type="button" value="Add Details" id="addDetails" class="btn btn-primary">
+              <!-- <button type="button" class="btn btn-primary">Add Detail</button> -->
+            </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="table-content">
+        <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Roll No</th>
+                <th scope="col">Name</th>
+                <th scope="col">Class</th>
+                <th scope="col">Division</th>
+                <th scope="col">English</th>
+                <th scope="col">Maths</th>
+                <th scope="col">Hindi</th>
+                <th scope="col">Marathi</th>
+                <th scope="col">Result</th>
+              </tr>
+            </thead>
+            <tbody id="table-body" class="table-group-divider">
+             
+            </tbody>
+          </table>
+      </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  </body>
+</html>
